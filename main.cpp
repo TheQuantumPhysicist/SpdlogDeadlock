@@ -4,6 +4,8 @@
 #include <iostream>
 #include <locale>
 #include <string>
+#include <thread>
+#include <chrono>
 
 std::string PossiblyWideStringToString(const std::string& str) { return str; }
 
@@ -25,26 +27,10 @@ void InitLogging()
     const bool rotateFile  = true;
 
     // max file size
-    const std::size_t maxSize = [&]() {
-        const int64_t paramMaxLogFiles = 5;
-        if (paramMaxLogFiles <= 0) {
-            // default values
-            return static_cast<std::size_t>(isDebugMode ? 1 << 30 : 1 << 30);
-        } else {
-            return static_cast<std::size_t>(paramMaxLogFiles);
-        }
-    }();
+    const std::size_t maxSize = 1 << 30;
 
     // max rotated files
-    const std::size_t maxFiles = [&]() {
-        const int64_t paramMaxLogFileSize = 1 << 30;
-        if (paramMaxLogFileSize <= 0) {
-            // default values
-            return static_cast<std::size_t>(isDebugMode ? 10 : 2);
-        } else {
-            return static_cast<std::size_t>(paramMaxLogFileSize);
-        }
-    }();
+    const std::size_t maxFiles = 5;
 
     const b_sev minSeverity = isDebugMode ? b_sev::debug : b_sev::info;
 
@@ -64,6 +50,11 @@ void InitLogging()
 
 int main()
 {
+    InitLogging();
     NLog.write(b_sev::info, "Started!");
+    for(int i = 0; ; i++) {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        NLog.write(b_sev::info, "{} more!", i);
+    }
     return 0;
 }

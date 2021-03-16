@@ -45,16 +45,8 @@ class DefaultLogger
 public:
     DefaultLogger()
     {
-        dist_sink = std::make_shared<spdlog::sinks::dist_sink_mt>();
-        std::atomic_thread_fence(std::memory_order_seq_cst);
-        tp = std::make_shared<spdlog::details::thread_pool>(4096, std::thread::hardware_concurrency());
-        std::atomic_thread_fence(std::memory_order_seq_cst);
-        logger = std::make_shared<spdlog::async_logger>("", dist_sink, tp);
-        std::atomic_thread_fence(std::memory_order_seq_cst);
         spdlog::register_logger(logger);
-        std::atomic_thread_fence(std::memory_order_seq_cst);
         spdlog::flush_every(std::chrono::seconds(5));
-        std::atomic_thread_fence(std::memory_order_seq_cst);
     }
 
     static std::string severity_as_string(b_sev severity)
